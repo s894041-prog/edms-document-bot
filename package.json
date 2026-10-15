@@ -1,0 +1,16 @@
+{
+  "name": "document-bot",
+  "version": "1.0.0",
+  "description": "台中市國小公文自動化處理系統",
+  "scripts": {
+    "main": "node src/workflow-main.js",
+    "decision": "node src/workflow-decision.js",
+    "test-login": "node src/test-login.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "playwright": "^1.49.1"
+  }
+}

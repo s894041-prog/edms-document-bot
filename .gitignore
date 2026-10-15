@@ -1,0 +1,14 @@
+# 機密
+.env
+.env.*
+!.env.example
+*.local
+secrets.*
+
+# 相依套件
+node_modules/
+
+# Claude 個人設定
+.claude/
+settings.local.json
+CLAUDE.local.md

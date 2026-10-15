@@ -1,0 +1,110 @@
+{
+  "name": "主辦公文自動化",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "schedule-main",
+      "name": "排程（週一至五 早上8點）",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "command": "node C:\\scripts\\document-bot\\src\\workflow-main.js"
+      },
+      "id": "execute-main",
+      "name": "執行主辦公文流程",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.exitCode }}",
+              "operation": "notEqual",
+              "value2": "0"
+            }
+          ]
+        }
+      },
+      "id": "check-error",
+      "name": "檢查是否有錯誤",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "credentials",
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=❌ n8n 執行主辦公文流程失敗\n\n錯誤輸出：\n{{ $json.stderr.substring(0, 500) }}",
+        "additionalFields": {}
+      },
+      "id": "telegram-error",
+      "name": "Telegram 錯誤通知",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [960, 200],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-cred",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "排程（週一至五 早上8點）": {
+      "main": [
+        [
+          {
+            "node": "執行主辦公文流程",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "執行主辦公文流程": {
+      "main": [
+        [
+          {
+            "node": "檢查是否有錯誤",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "檢查是否有錯誤": {
+      "main": [
+        [
+          {
+            "node": "Telegram 錯誤通知",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": ["公文系統", "主辦"],
+  "notes": "執行前請至 n8n Credentials 設定 Telegram Bot API Token（YOUR_TELEGRAM_BOT_TOKEN）"
+}
